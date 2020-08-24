@@ -1,24 +1,16 @@
-#include <stdio.h>
-#include <conio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <windows.h>
+#define _CRT_SECURE_NO_WARNINGS
 #include "PhoneBookApplication.h"
 
-void main()
+int main()
 {
-	system("color 5f");
 	start();
-	return 0;
-}
 
-void back()
-{
-	start();
+	return 0;
 }
 
 void start()
 {
+	system("color 5f");
 	menu();
 }
 
@@ -35,7 +27,7 @@ void menu()
 		add_record();
 		break;
 	case '2':
-		list_record();
+		list_records();
 		break;
 	case '3':
 		exit(0);
@@ -49,58 +41,63 @@ void menu()
 		delete_record();
 		break;
 	default:
-		system("cls");
 		printf("\nEnter 1 to 6 only");
-		printf("\nEnter any key...");
-		getch();
-		menu();
+		ending_process();
 	}
 }
 
-void display_person_info(Person person)
+void display_person_info(Person* person_ptr)
 {
-	printf("\nFull Name: %s \nID: %s \nAddress: %s \nFather Name: %s \nMother Name: %s \nPhone Number: %s \nGender: %s \nE-mail: %s ", person.full_name, person.id, person.address, person.father_name, person.mother_name, person.phone_number, person.gender, person.email);
+	printf("\nFull Name: %s \nID: %s \nAddress: %s \nFather Name: %s \nMother Name: %s \nPhone Number: %s \nGender: %s \nE-mail: %s ", person_ptr->full_name, person_ptr->id, person_ptr->address, person_ptr->father_name, person_ptr->mother_name, person_ptr->phone_number, person_ptr->gender, person_ptr->email);
 }
 
 void ending_process()
 {
 	printf("\n\nEnter any key...");
-	getch();
+	_getch(); // getch()
 	system("cls");
 	menu();
 }
 
-void add_record()
+void get_person_info(Person* person_ptr)
 {
-	system("cls");
-	FILE* file;
-	Person person;
-	file = fopen("PhoneBookRecords.txt", "ab+");
 	printf("\nEnter Full Name:");
-	get_input(person.full_name);
+	get_input(person_ptr->full_name, NAME_LIMIT);
 
 	printf("\nEnter ID:");
-	get_input(person.id);
-	
-	printf("\nEnter Address:");
-	get_input(person.address);
-	
-	printf("\nEnter Father Name:");
-	get_input(person.father_name);
-	
-	printf("\nEnter Mother Name:");
-	get_input(person.mother_name);
-	
-	printf("\nEnter Phone Number:");
-	get_input(person.phone_number);
-	
-	printf("\nEnter Gender:");
-	get_input(person.gender);
-	
-	printf("\nEnter E-mail:");
-	get_input(person.email);
+	get_input(person_ptr->id, ID_LIMIT);
 
-	fwrite(&person, sizeof(person), 1, file);
+	printf("\nEnter Address:");
+	get_input(person_ptr->address, ADDRESS_LIMIT);
+
+	printf("\nEnter Father Name:");
+	get_input(person_ptr->father_name, NAME_LIMIT);
+
+	printf("\nEnter Mother Name:");
+	get_input(person_ptr->mother_name, NAME_LIMIT);
+
+	printf("\nEnter Phone Number:");
+	get_input(person_ptr->phone_number, PHONE_NUMBER_LIMIT);
+
+	printf("\nEnter Gender:");
+	get_input(person_ptr->gender, GENDER_LIMIT);
+
+	printf("\nEnter E-mail:");
+	get_input(person_ptr->email, EMAIL_LIMIT);
+}
+
+void add_record()
+{
+	FILE* file;
+	Person person;
+
+	system("cls");
+
+	file = fopen("PhoneBookRecords.txt", "ab+");
+	
+	get_person_info(&person);
+
+	fwrite(&person, sizeof(Person), 1, file);
 
 	fflush(stdin);
 	printf("\nRecord Saved!");
@@ -113,6 +110,9 @@ void list_records()
 {
 	Person person;
 	FILE* file;
+
+	system("cls");
+
 	file = fopen("PhoneBookRecords.txt", "rb");
 	
 	if (!file)
@@ -121,12 +121,14 @@ void list_records()
 		exit(1);
 	}
 
-	while (fread(&person, sizeof(person), 1, file) == 1)
+	printf("\n\n\YOUR RECORDS\n\n");
+	fflush(stdin);
+	while (fread(&person, sizeof(Person), 1, file) == 1)
 	{
-		printf("\n\n\nYOUR RECORD IS\n\n");
-		display_person_info(person);
-		getch();
-		system("cls");
+		display_person_info(&person);
+		printf("\n\n");
+
+		fflush(stdin);
 	}
 
 	fclose(file);
@@ -141,6 +143,8 @@ void search_record()
 	FILE* file;
 	char name_to_search[50];
 
+	system("cls");
+
 	file = fopen("PhoneBookRecords.txt", "rb");
 	if (!file)
 	{
@@ -149,16 +153,19 @@ void search_record()
 	}
 
 	printf("\nEnter name of person to search in the record:\n");
-	get_input(name_to_search);
+	get_input(name_to_search, NAME_LIMIT);
 
-	while (fread(&person, sizeof(person), 1, file) == 1)
+	fflush(stdin);
+	while (fread(&person, sizeof(Person), 1, file) == 1)
 	{
 		if (strcmp(person.full_name, name_to_search) == 0)
 		{
 			printf("\n\t Detail Information About %s: ", person.full_name);
-			display_person_info(person);
+			display_person_info(&person);
 			found_name = 1;
 		}
+
+		fflush(stdin);
 	}
 
 	if (!found_name)
@@ -179,6 +186,8 @@ void delete_record()
 	int found_name = 0;
 	char name_to_delete[50];
 
+	system("cls");
+
 	file = fopen("PhoneBookRecords.txt", "rb");
 	if (!file)
 	{
@@ -194,19 +203,21 @@ void delete_record()
 	}
 
 	printf("\nEnter contact's name: ");
-	get_input(name_to_delete);
+	get_input(name_to_delete, NAME_LIMIT);
 
 	fflush(stdin);
-	while (fread(&person, sizeof(person), 1, file) == 1)
+	while (fread(&person, sizeof(Person), 1, file) == 1)
 	{
 		if (strcmp(person.full_name, name_to_delete) != 0)
 		{
-			fwrite(&person, sizeof(person), 1, temp_file);
+			fwrite(&person, sizeof(Person), 1, temp_file);
 		}
 		else // => name found (strcmp == 0)
 		{
 			found_name = 1;
 		}
+
+		fflush(stdin);
 	}
 
 	fclose(file);
@@ -216,7 +227,7 @@ void delete_record()
 	{
 		remove("PhoneBookRecords.txt");
 		rename("temp.txt", "PhoneBookRecords.txt");
-		printf("\nRECORD DELETED SUCCESSFULLY");
+		printf("\nCONTACT RECORD DELETED SUCCESSFULLY");
 	}
 	else
 	{
@@ -229,10 +240,75 @@ void delete_record()
 
 void modify_record()
 {
-	// Line 227
+	FILE* file;
+	int found_name = 0;
+	Person person, temp_person;
+	char name_to_modify[50];
+
+	system("cls");
+
+	file = fopen("PhoneBookRecords.txt", "rb+");
+	if (!file)
+	{
+		printf("\nFile opening error...");
+		exit(1);
+	}
+
+	printf("\nEnter contact's name to modify: ");
+	get_input(name_to_modify, NAME_LIMIT);
+
+	fflush(stdin);
+	while (fread(&person, sizeof(Person), 1, file) == 1)
+	{
+		if (strcmp(name_to_modify, person.full_name) == 0)
+		{
+			get_person_info(&temp_person);
+			fseek(file, -(int)sizeof(Person), SEEK_CUR);
+			fwrite(&temp_person, sizeof(Person), 1, file);
+			found_name = 1;
+			break;
+		}
+
+		fflush(stdin);
+	}
+
+	if (found_name)
+	{
+		printf("\nCONTACT MODIFIED SUCCESSFULLY");
+	}
+	else
+	{
+		printf("\nNo contact record to modify...");
+	}
+
+	fclose(file);
+
+	ending_process();
 }
 
-void get_input(char* input)
+void get_input(char* input_buffer, int limit)
 {
+	int i = 0, counter = 1;
+	char input_char, display_char;
 
+	do
+	{
+		input_char = _getch(); // getch()
+
+		if (input_char != 8 && input_char != 13)
+		{
+			*(input_buffer + i) = input_char;
+			_putch(input_char); // putch(input_char)
+			i++;
+			counter++;
+		}
+
+		if (counter + 1 == limit) 
+		{
+			break;
+		}
+
+	} while (input_char != 13);
+
+	*(input_buffer + i) = '\0';
 }

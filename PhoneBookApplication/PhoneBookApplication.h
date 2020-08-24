@@ -7,24 +7,32 @@
 #include <stdlib.h>
 #include <windows.h>
 
+#define NAME_LIMIT  50
+#define ID_LIMIT  15
+#define ADDRESS_LIMIT 50
+#define PHONE_NUMBER_LIMIT  20
+#define GENDER_LIMIT  8
+#define EMAIL_LIMIT  100
+
 typedef struct person
 {
-	char full_name[50];
-	char id[15];
-	char address[50];
-	char father_name[50];
-	char mother_name[50];
-	char phone_number[20];
-	char gender[8];
-	char email[100];
+	char full_name[NAME_LIMIT];
+	char id[ID_LIMIT];
+	char address[ADDRESS_LIMIT];
+	char father_name[NAME_LIMIT];
+	char mother_name[NAME_LIMIT];
+	char phone_number[PHONE_NUMBER_LIMIT];
+	char gender[GENDER_LIMIT];
+	char email[EMAIL_LIMIT];
+
 } Person;
 
-void menu();
-void get_input(char* input);
-void display_person_info(Person person);
-void ending_process();
 void start();
-void back();
+void menu();
+void get_person_info(Person* person_ptr);
+void get_input(char* input_buffer, int limit);
+void display_person_info(Person* person_ptr);
+void ending_process();
 void add_record();
 void list_records();
 void modify_record();
