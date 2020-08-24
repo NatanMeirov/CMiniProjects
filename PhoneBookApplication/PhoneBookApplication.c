@@ -121,7 +121,7 @@ void list_records()
 		exit(1);
 	}
 
-	printf("\n\n\YOUR RECORDS\n\n");
+	printf("\n\nYOUR RECORDS\n\n");
 	fflush(stdin);
 	while (fread(&person, sizeof(Person), 1, file) == 1)
 	{
